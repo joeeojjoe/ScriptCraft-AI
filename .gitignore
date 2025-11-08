@@ -20,8 +20,8 @@ backend/*.log
 
 # 环境变量文件
 backend/.env
-backend/application-local.yml
-backend/application-dev.yml
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-dev.yml
 
 # ========================
 # 前端 (Vue + Node)
