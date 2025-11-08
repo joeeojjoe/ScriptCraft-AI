@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scriptcraftai.backend.mapper.ScriptVersionMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.scriptcraftai.backend.entity.ScriptVersion">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="session_id" property="sessionId" jdbcType="VARCHAR"/>
+        <result column="version_index" property="versionIndex" jdbcType="INTEGER"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content_json" property="contentJson" jdbcType="VARCHAR"/>
+        <result column="is_selected" property="isSelected" jdbcType="TINYINT"/>
+        <result column="word_count" property="wordCount" jdbcType="INTEGER"/>
+        <result column="scene_count" property="sceneCount" jdbcType="INTEGER"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <!-- 插入版本 -->
+    <insert id="insert" parameterType="com.scriptcraftai.backend.entity.ScriptVersion">
+        INSERT INTO script_versions (
+            id, session_id, version_index, title, content_json, 
+            is_selected, word_count, scene_count, created_at, updated_at
+        ) VALUES (
+            #{id}, #{sessionId}, #{versionIndex}, #{title}, #{contentJson},
+            #{isSelected}, #{wordCount}, #{sceneCount}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 根据ID查询版本 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM script_versions WHERE id = #{id}
+    </select>
+    
+    <!-- 根据会话ID查询所有版本 -->
+    <select id="selectBySessionId" resultMap="BaseResultMap">
+        SELECT * FROM script_versions 
+        WHERE session_id = #{sessionId}
+        ORDER BY version_index ASC
+    </select>
+    
+    <!-- 更新脚本版本 -->
+    <update id="update">
+        UPDATE script_versions
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="contentJson != null">content_json = #{contentJson},</if>
+            <if test="wordCount != null">word_count = #{wordCount},</if>
+            <if test="sceneCount != null">scene_count = #{sceneCount},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 更新选中状态 -->
+    <update id="updateSelectedStatus">
+        UPDATE script_versions
+        SET is_selected = #{isSelected}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 取消会话下所有版本的选中状态 -->
+    <update id="unselectAllBySessionId">
+        UPDATE script_versions
+        SET is_selected = 0, updated_at = NOW()
+        WHERE session_id = #{sessionId}
+    </update>
+    
+    <!-- 删除版本 -->
+    <delete id="deleteById">
+        DELETE FROM script_versions WHERE id = #{id}
+    </delete>
+</mapper>
+

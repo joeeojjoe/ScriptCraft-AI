@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scriptcraftai.backend.mapper.ScriptSessionMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.scriptcraftai.backend.entity.ScriptSession">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="video_type" property="videoType" jdbcType="VARCHAR"/>
+        <result column="theme_input" property="themeInput" jdbcType="VARCHAR"/>
+        <result column="style_preference" property="stylePreference" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <!-- 插入会话 -->
+    <insert id="insert" parameterType="com.scriptcraftai.backend.entity.ScriptSession">
+        INSERT INTO script_sessions (
+            id, user_id, video_type, theme_input, style_preference, created_at
+        ) VALUES (
+            #{id}, #{userId}, #{videoType}, #{themeInput}, #{stylePreference}, NOW()
+        )
+    </insert>
+    
+    <!-- 根据ID查询会话 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM script_sessions WHERE id = #{id}
+    </select>
+    
+    <!-- 查询用户的会话列表（分页） -->
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM script_sessions 
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 统计用户的会话总数 -->
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM script_sessions WHERE user_id = #{userId}
+    </select>
+    
+    <!-- 删除会话 -->
+    <delete id="deleteById">
+        DELETE FROM script_sessions WHERE id = #{id}
+    </delete>
+</mapper>
+

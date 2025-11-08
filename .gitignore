@@ -30,6 +30,7 @@ backend/application-local.yml
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
+frontend/package-lock.json
 
 # 前端日志
 frontend/*.log
@@ -92,3 +93,5 @@ nbdist/
 *.bak
 *.swp
 *~
+
+/logs/
