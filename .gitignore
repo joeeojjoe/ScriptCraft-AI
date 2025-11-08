@@ -1,8 +1,94 @@
-# 默认忽略的文件
-/shelf/
-/.idea/workspace.xml
-# 基于编辑器的 HTTP 客户端请求
-/httpRequests/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+# ========================
+# 后端 (Spring Boot + Maven)
+# ========================
+
+# Maven
+backend/target/
+backend/pom.xml.tag
+backend/pom.xml.releaseBackup
+backend/pom.xml.versionsBackup
+backend/pom.xml.next
+backend/release.properties
+backend/dependency-reduced-pom.xml
+backend/buildNumber.properties
+backend/.mvn/timing.properties
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot 日志
+backend/logs/
+backend/*.log
+
+# 环境变量文件
+backend/.env
+backend/application-local.yml
+
+# ========================
+# 前端 (Vue + Node)
+# ========================
+
+# Node modules
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# 前端日志
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# 前端环境变量
+frontend/.env.local
+frontend/.env.*.local
+
+# ========================
+# IDE 和编辑器
+# ========================
+
+# IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+
+# ========================
+# 操作系统
+# ========================
+
+# Mac
+.DS_Store
+
+# Windows
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ========================
+# 临时文件
+# ========================
+
+*.tmp
+*.bak
+*.swp
+*~
