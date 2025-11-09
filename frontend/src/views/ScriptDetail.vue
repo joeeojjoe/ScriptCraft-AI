@@ -124,7 +124,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getScriptDetail, updateScript } from '@/api/script'
+import { getScriptDetail, updateScript, selectScript } from '@/api/script'
 import { DocumentCopy, Edit } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -198,12 +198,25 @@ const saveScript = async () => {
   }
 }
 
-/**
- * 返回上一页
- */
-const goBack = () => {
-  router.back()
-}
+  /**
+   * 返回上一页
+   */
+  const goBack = () => {
+    router.back()
+  }
+
+  /**
+   * 保存脚本前更新选中状态
+   */
+  const updateSelectedStatus = async () => {
+    if (scriptDetail.value && scriptDetail.value.isSelected) {
+      try {
+        await selectScript(scriptDetail.value.id)
+      } catch (error) {
+        console.error('更新选中状态失败:', error)
+      }
+    }
+  }
 
 onMounted(() => {
   loadDetail()

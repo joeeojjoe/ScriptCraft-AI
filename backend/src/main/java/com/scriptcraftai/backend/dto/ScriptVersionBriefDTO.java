@@ -34,6 +34,11 @@ public class ScriptVersionBriefDTO {
      * 预览信息
      */
     private PreviewDTO preview;
+
+    /**
+     * 是否被选中：1-是，0-否
+     */
+    private Integer isSelected;
     
     /**
      * 预览信息DTO

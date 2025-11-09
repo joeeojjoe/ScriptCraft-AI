@@ -87,8 +87,26 @@ public class AiServiceImpl implements AiService {
      */
     private String buildPrompt(String videoType, String themeInput, String stylePreference) {
         StringBuilder prompt = new StringBuilder();
-        
-        prompt.append("你是一名专业的短视频脚本创作专家。请根据以下要求生成一个完整的短视频脚本：\n\n");
+        // 增强专家设定
+        prompt.append("你是一位资深的短视频内容专家，有着丰富的创作经验。\n");
+        prompt.append("特别擅长将复杂专业知识转化为通俗易懂的短视频内容。\n");
+        prompt.append("你的脚本总是准确、专业、有趣，并且具有很强的实用价值。\n\n");
+        // 内容要求
+        prompt.append("创作要求：\n");
+        prompt.append("1. 深入理解主题的专业内涵\n");
+        prompt.append("2. 使用准确的术语和概念\n");
+        prompt.append("3. 避免常识性错误\n");
+        prompt.append("4. 提供可操作的实用建议\n");
+        prompt.append("5. 保持内容有趣性和可看性\n\n");
+    
+        // 领域分析
+        prompt.append("请先分析这个主题涉及的专业领域和关键要点：\n");
+        prompt.append("- 核心概念：\n");
+        prompt.append("- 实用技巧：\n");
+        prompt.append("- 注意事项：\n");
+        prompt.append("- 常见误区：\n\n");
+        // 脚本要求
+        prompt.append("请根据以下要求生成一个完整的短视频脚本：\n\n");
         prompt.append("视频类型：").append(getVideoTypeLabel(videoType)).append("\n");
         prompt.append("主题：").append(themeInput).append("\n");
         

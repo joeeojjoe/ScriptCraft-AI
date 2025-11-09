@@ -10,13 +10,14 @@
           :label="`方案 ${version.versionIndex}`"
           :name="version.versionId"
         >
-          <el-card class="script-card">
+          <el-card class="script-card" :class="{ 'selected-card': version.isSelected }">
             <template #header>
               <div class="card-header">
                 <h2>{{ version.title }}</h2>
                 <div class="stats">
                   <el-tag>{{ version.preview.sceneCount }} 个分镜</el-tag>
                   <el-tag type="info">{{ version.preview.wordCount }} 字</el-tag>
+                  <el-tag v-if="version.isSelected" type="success">已选中</el-tag>
                 </div>
               </div>
             </template>
@@ -36,11 +37,21 @@
                 查看完整脚本
               </el-button>
               <el-button
+                v-if="!version.isSelected"
                 size="large"
                 @click="selectScript(version.versionId)"
               >
                 <el-icon><Select /></el-icon>
                 选择此方案
+              </el-button>
+              <el-button
+                v-else
+                type="success"
+                size="large"
+                disabled
+              >
+                <el-icon><Check /></el-icon>
+                已选择此方案
               </el-button>
             </div>
           </el-card>
@@ -58,12 +69,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getSessionVersions, selectScript as selectScriptApi } from '@/api/script'
 import { useScriptStore } from '@/stores/script'
-import { View, Select, RefreshRight } from '@element-plus/icons-vue'
+import { View, Select, RefreshRight, Check } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -73,22 +84,24 @@ const activeTab = ref('')
 const versions = ref([])
 const sessionId = route.params.sessionId
 
-/**
- * 加载脚本列表
- */
-const loadVersions = async () => {
-  try {
-    const res = await getSessionVersions(sessionId)
-    versions.value = res
-    
-    if (res.length > 0) {
-      activeTab.value = res[0].versionId
+  /**
+   * 加载脚本列表
+   */
+  const loadVersions = async () => {
+    try {
+      const res = await getSessionVersions(sessionId)
+      versions.value = res.map(version => ({
+        ...version,
+        isSelected: version.isSelected === 1 // 后端返回的是数字，需要转换为布尔值
+      }))
+      if (res.length > 0) {
+        activeTab.value = res[0].versionId
+      }
+    } catch (error) {
+      console.error('加载脚本列表失败:', error)
+      ElMessage.error('加载失败，请刷新重试')
     }
-  } catch (error) {
-    console.error('加载脚本列表失败:', error)
-    ElMessage.error('加载失败，请刷新重试')
   }
-}
 
 /**
  * 查看脚本详情
@@ -97,17 +110,22 @@ const viewDetail = (versionId) => {
   router.push(`/script/detail/${versionId}`)
 }
 
-/**
- * 选择脚本
- */
-const selectScript = async (versionId) => {
-  try {
-    await selectScriptApi(versionId)
-    ElMessage.success('已标记为选中方案')
-  } catch (error) {
-    console.error('选择脚本失败:', error)
+  /**
+   * 选择脚本
+   */
+  const selectScript = async (versionId) => {
+    try {
+      await selectScriptApi(versionId)
+      ElMessage.success('已标记为选中方案')
+
+      // 更新本地状态
+      versions.value.forEach(version => {
+        version.isSelected = version.versionId === versionId
+      })
+    } catch (error) {
+      console.error('选择脚本失败:', error)
+    }
   }
-}
 
 /**
  * 重新生成
@@ -130,12 +148,19 @@ const regenerate = async () => {
   }
 }
 
-/**
- * 返回上一页
- */
-const goBack = () => {
-  router.push('/home')
-}
+  /**
+   * 返回上一页
+   */
+  const goBack = () => {
+    router.push('/home')
+  }
+
+  /**
+   * 页面激活时重新加载数据（解决从详情页返回时状态丢失问题）
+   */
+  onActivated(() => {
+    loadVersions()
+  })
 
 onMounted(() => {
   loadVersions()

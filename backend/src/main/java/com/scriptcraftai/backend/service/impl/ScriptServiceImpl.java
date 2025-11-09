@@ -189,6 +189,7 @@ public class ScriptServiceImpl implements ScriptService {
             dto.setVersionId(version.getId());
             dto.setVersionIndex(version.getVersionIndex());
             dto.setTitle(version.getTitle());
+            dto.setIsSelected(version.getIsSelected());
             
             ScriptVersionBriefDTO.PreviewDTO preview = new ScriptVersionBriefDTO.PreviewDTO();
             preview.setWordCount(version.getWordCount());
