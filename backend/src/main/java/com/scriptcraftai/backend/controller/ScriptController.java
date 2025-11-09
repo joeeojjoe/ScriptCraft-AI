@@ -50,7 +50,7 @@ public class ScriptController {
         try {
             // 同步调用，避免异步线程安全上下文问题
             GenerateScriptDTO result = scriptService.generateScripts(request, userId)
-                    .get(180, java.util.concurrent.TimeUnit.SECONDS); // 3分钟超时
+                    .get(300, java.util.concurrent.TimeUnit.SECONDS); // 5分钟超时
 
             log.info("脚本生成成功，返回结果: sessionId={}", result.getSessionId());
             return Result.success(result, "生成成功");

@@ -153,7 +153,7 @@ public class AiServiceImpl implements AiService {
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(60))
                     .block();
             
             log.debug("通义千问API响应: {}", response);

@@ -5,6 +5,12 @@ spring:
     username: root
     password: wangshijun123
 
+# 通义千问API配置
+tongyi:
+  api-key: ${TONGYI_API_KEY:sk-83cc6dd2d5244ea68962edad7cc0a1cb}
+  api-url: https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
+  model: qwen-plus
+
 logging:
   level:
     com.scriptcraftai.backend: DEBUG
