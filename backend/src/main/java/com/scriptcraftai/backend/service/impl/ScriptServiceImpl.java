@@ -210,13 +210,13 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public Map<String, Object> getUserHistory(String userId, Integer page, Integer pageSize) {
+    public Map<String, Object> getUserHistory(String userId, Integer page, Integer pageSize, String videoType) {
         page = (page != null && page > 0) ? page : 1;
         pageSize = (pageSize != null && pageSize > 0 && pageSize <= 50) ? pageSize : 10;
         
         int offset = (page - 1) * pageSize;
         int total = sessionMapper.countByUserId(userId);
-        List<ScriptSession> sessions = sessionMapper.selectByUserId(userId, offset, pageSize);
+        List<ScriptSession> sessions = sessionMapper.selectByUserId(userId, offset, pageSize, videoType);
         
         Map<String, Object> result = new HashMap<>();
         result.put("total", total);

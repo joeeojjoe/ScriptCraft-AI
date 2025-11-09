@@ -150,13 +150,15 @@ public class ScriptController {
      * 
      * @param page 页码
      * @param pageSize 每页数量
+     * @param videoType 视频类型
      * @return 历史记录
      */
     @GetMapping("/sessions")
     public Result<Map<String, Object>> getUserHistory(@RequestParam(required = false) Integer page,
-                                                       @RequestParam(required = false) Integer pageSize) {
+                                                       @RequestParam(required = false) Integer pageSize,
+                                                        @RequestParam(required = false) String videoType) {
         String userId = getCurrentUserId();
-        Map<String, Object> history = scriptService.getUserHistory(userId, page, pageSize);
+        Map<String, Object> history = scriptService.getUserHistory(userId, page, pageSize, videoType);
         return Result.success(history);
     }
 

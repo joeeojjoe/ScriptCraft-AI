@@ -95,7 +95,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getScriptHistory } from '@/api/script'
-import {getVideoTypeLabel, getStyleLabel, getVideoTypeValue, VIDEO_TYPES} from '@/utils/constants'
+import {getVideoTypeLabel, getStyleLabel, VIDEO_TYPES} from '@/utils/constants'
 import { Search } from '@element-plus/icons-vue'
 
 const router = useRouter()

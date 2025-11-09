@@ -69,8 +69,9 @@ public interface ScriptService {
      * @param userId 用户ID
      * @param page 页码
      * @param pageSize 每页数量
+     * @param videoType 视频类型
      * @return 历史记录
      */
-    Map<String, Object> getUserHistory(String userId, Integer page, Integer pageSize);
+    Map<String, Object> getUserHistory(String userId, Integer page, Integer pageSize, String videoType);
 }
 

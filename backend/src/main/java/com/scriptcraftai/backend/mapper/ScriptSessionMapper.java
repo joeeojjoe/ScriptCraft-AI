@@ -37,11 +37,13 @@ public interface ScriptSessionMapper {
      * @param userId 用户ID
      * @param offset 偏移量
      * @param limit 限制数量
+     * @param videoType 视频类型
      * @return 会话列表
      */
     List<ScriptSession> selectByUserId(@Param("userId") String userId, 
                                       @Param("offset") Integer offset, 
-                                      @Param("limit") Integer limit);
+                                      @Param("limit") Integer limit,
+                                       @Param("videoType") String videoType);
     
     /**
      * 统计用户的会话总数

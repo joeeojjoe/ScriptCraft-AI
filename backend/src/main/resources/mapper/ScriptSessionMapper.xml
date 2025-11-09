@@ -30,7 +30,12 @@
     <!-- 查询用户的会话列表（分页） -->
     <select id="selectByUserId" resultMap="BaseResultMap">
         SELECT * FROM script_sessions 
-        WHERE user_id = #{userId}
+        <where>
+            user_id = #{userId}
+                 <if test="videoType != null">
+                     AND video_type LIKE CONCAT('%', #{videoType}, '%')
+                 </if>
+        </where>
         ORDER BY created_at DESC
         LIMIT #{offset}, #{limit}
     </select>
