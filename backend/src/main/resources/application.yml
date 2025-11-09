@@ -45,10 +45,9 @@ mybatis:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
-# JWT配置
-jwt:
-  secret: ${JWT_SECRET:ScriptCraftAI2025SecretKeyForJWTTokenGenerationAndValidation}
-  expiration: 604800000  # 7天（毫秒）
+# 会话配置
+session:
+  timeout: 604800  # 会话过期时间（秒）：7天
 
 # 通义千问API配置
 tongyi:

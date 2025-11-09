@@ -19,18 +19,18 @@ import java.util.concurrent.Executor;
 
 /**
  * Spring Security配置类
- * 
- * @description 配置安全策略和JWT过滤器
+ *
+ * @description 配置安全策略和会话认证过滤器
  * @author ScriptCraft AI Team
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    private final SessionAuthenticationFilter sessionAuthenticationFilter;
+
+    public SecurityConfig(SessionAuthenticationFilter sessionAuthenticationFilter) {
+        this.sessionAuthenticationFilter = sessionAuthenticationFilter;
         // 配置Security上下文在异步线程中可用
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
@@ -86,8 +86,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             
-            // 添加JWT过滤器
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            // 添加会话认证过滤器
+            .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }

@@ -5,6 +5,7 @@ import com.scriptcraftai.backend.dto.LoginDTO;
 import com.scriptcraftai.backend.dto.UserDTO;
 import com.scriptcraftai.backend.request.LoginRequest;
 import com.scriptcraftai.backend.request.RegisterRequest;
+import com.scriptcraftai.backend.service.SessionService;
 import com.scriptcraftai.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class AuthController {
     
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SessionService sessionService;
 
     /**
      * 用户注册
@@ -55,7 +59,7 @@ public class AuthController {
 
     /**
      * 获取当前用户信息
-     * 
+     *
      * @return 用户信息
      */
     @GetMapping("/profile")
@@ -64,6 +68,25 @@ public class AuthController {
         log.info("获取用户信息: userId={}", userId);
         UserDTO userDTO = userService.getUserById(userId);
         return Result.success(userDTO, "获取成功");
+    }
+
+    /**
+     * 用户登出
+     *
+     * @return 操作结果
+     */
+    @PostMapping("/logout")
+    public Result<Void> logout() {
+        try {
+            String userId = getCurrentUserId();
+            // 根据用户ID销毁所有会话（支持多设备登录）
+            sessionService.destroyUserSessions(userId);
+            log.info("用户登出成功: userId={}", userId);
+            return Result.success("登出成功");
+        } catch (Exception e) {
+            log.error("登出失败", e);
+            return Result.failed("登出失败");
+        }
     }
 
     /**

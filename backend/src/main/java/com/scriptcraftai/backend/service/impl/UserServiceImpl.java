@@ -9,7 +9,7 @@ import com.scriptcraftai.backend.request.LoginRequest;
 import com.scriptcraftai.backend.request.RegisterRequest;
 import com.scriptcraftai.backend.service.UserService;
 import com.scriptcraftai.backend.util.IdGenerator;
-import com.scriptcraftai.backend.util.JwtUtil;
+import com.scriptcraftai.backend.service.SessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,9 +33,9 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @Autowired
-    private JwtUtil jwtUtil;
+    private SessionService sessionService;
     
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -102,15 +102,16 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(403, "账号已被禁用，请联系管理员");
         }
         
-        // 4. 生成JWT令牌
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
-        
+        // 4. 创建会话
+        UserDTO userDTO = convertToDTO(user);
+        String token = sessionService.createSession(user.getId(), userDTO);
+
         log.info("用户登录成功: userId={}, email={}", user.getId(), user.getEmail());
-        
+
         // 5. 返回登录信息
         LoginDTO loginDTO = new LoginDTO();
         loginDTO.setToken(token);
-        loginDTO.setUser(convertToDTO(user));
+        loginDTO.setUser(userDTO);
         
         return loginDTO;
     }
