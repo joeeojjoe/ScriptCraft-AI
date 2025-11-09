@@ -73,5 +73,11 @@ public interface ScriptService {
      * @return 历史记录
      */
     Map<String, Object> getUserHistory(String userId, Integer page, Integer pageSize, String videoType);
+
+    /**
+     * 删除会话
+     * @param sessionId 会话ID
+     */
+    void deleteSession(String sessionId);
 }
 

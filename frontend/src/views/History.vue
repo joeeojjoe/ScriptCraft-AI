@@ -94,7 +94,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getScriptHistory } from '@/api/script'
+import {deleteScriptSession, getScriptHistory} from '@/api/script'
 import {getVideoTypeLabel, getStyleLabel, VIDEO_TYPES} from '@/utils/constants'
 import { Search } from '@element-plus/icons-vue'
 
@@ -155,12 +155,16 @@ const deleteSession = async (sessionId) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    
-    // TODO: 实现删除接口
+
+    // 调用删除接口
+    await deleteScriptSession(sessionId)
     ElMessage.success('删除成功')
-    loadHistory()
+    await loadHistory()
   } catch {
-    // 用户取消
+    // 用户取消或删除失败
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败: ' + (error.message || '请稍后重试'))
+    }
   }
 }
 

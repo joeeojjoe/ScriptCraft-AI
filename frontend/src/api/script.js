@@ -82,3 +82,16 @@ export function getScriptHistory(params) {
   })
 }
 
+/**
+ * 删除会话
+ * @param sessionId
+ * @returns {*}
+ */
+export const deleteScriptSession = (sessionId) => {
+  return request({
+    url: `/scripts/sessions/${sessionId}`,
+    method: 'delete'
+  })
+}
+
+

@@ -227,7 +227,16 @@ public class ScriptServiceImpl implements ScriptService {
         
         return result;
     }
-    
+
+    @Override
+    public void deleteSession(String sessionId) {
+        ScriptSession session = sessionMapper.selectById(sessionId);
+        if (session == null) {
+            throw new BusinessException(404, "会话不存在");
+        }
+        sessionMapper.deleteById(sessionId);
+    }
+
     private int calculateWordCount(ScriptContentDTO content) {
         int count = 0;
         if (content.getScenes() != null) {

@@ -163,6 +163,15 @@ public class ScriptController {
     }
 
     /**
+     * 删除会话
+     */
+    @DeleteMapping("/sessions/{sessionId}")
+    public Result<Void> deleteSession(@PathVariable String sessionId) {
+        scriptService.deleteSession(sessionId);
+        return Result.success("删除成功");
+    }
+
+    /**
      * 获取当前登录用户ID
      * 
      * @return 用户ID
