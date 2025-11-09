@@ -47,7 +47,6 @@ public class ScriptServiceImpl implements ScriptService {
     @Async
     @Transactional(rollbackFor = Exception.class)
     public CompletableFuture<GenerateScriptDTO> generateScripts(GenerateScriptRequest request, String userId) {
-        log.info("开始生成脚本: userId={}, videoType={}", userId, request.getVideoType());
         
         try {
             // 1. 创建会话
@@ -58,7 +57,8 @@ public class ScriptServiceImpl implements ScriptService {
             session.setThemeInput(request.getThemeInput());
             session.setStylePreference(request.getStylePreference());
             sessionMapper.insert(session);
-            
+            //记录开始时间
+            long startTime = System.currentTimeMillis();
             // 2. 并行生成3个脚本方案
             List<CompletableFuture<ScriptContentDTO>> futures = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
@@ -103,13 +103,13 @@ public class ScriptServiceImpl implements ScriptService {
                 
                 versions.add(briefDTO);
             }
-            
-            log.info("脚本生成完成: sessionId={}, count={}", session.getId(), versions.size());
+            //记录结束时间
+            long endTime = System.currentTimeMillis();
+            log.info("脚本生成完成，所消耗的时间为{}",(endTime - startTime) / 1000.0);
             
             GenerateScriptDTO result = new GenerateScriptDTO();
             result.setSessionId(session.getId());
             result.setVersions(versions);
-            
             return CompletableFuture.completedFuture(result);
             
         } catch (Exception e) {

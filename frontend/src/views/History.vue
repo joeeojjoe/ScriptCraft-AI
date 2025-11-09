@@ -7,17 +7,20 @@
         <template #header>
           <div class="card-header">
             <h2>📚 历史记录</h2>
-            <el-input
-              v-model="keyword"
-              placeholder="搜索主题..."
-              style="width: 300px"
-              clearable
-              @input="handleSearch"
+            <el-select
+                v-model="keyword"
+                placeholder="请选择主题"
+                style="width: 300px"
+                clearable
+                @change="handleSearch"
             >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
+              <el-option
+                  v-for="item in VIDEO_TYPES"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
           </div>
         </template>
 
@@ -92,7 +95,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getScriptHistory } from '@/api/script'
-import { getVideoTypeLabel, getStyleLabel } from '@/utils/constants'
+import {getVideoTypeLabel, getStyleLabel, getVideoTypeValue, VIDEO_TYPES} from '@/utils/constants'
 import { Search } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -114,7 +117,7 @@ const loadHistory = async () => {
     const res = await getScriptHistory({
       page: currentPage.value,
       pageSize: pageSize.value,
-      keyword: keyword.value || undefined
+      videoType: keyword.value || undefined
     })
     
     historyList.value = res.sessions
