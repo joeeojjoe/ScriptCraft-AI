@@ -44,6 +44,19 @@
             </div>
             
             <div class="scene-content">
+              <div class="scene-header-actions">
+                <el-button
+                  :type="isSceneLocked(index) ? 'warning' : 'default'"
+                  size="small"
+                  @click="toggleSceneLock(index)"
+                  :icon="isSceneLocked(index) ? Lock : Unlock"
+                  :loading="sceneLocking.has(index)"
+                  :disabled="sceneLocking.has(index)"
+                >
+                  {{ isSceneLocked(index) ? '已锁定' : '锁定分镜' }}
+                </el-button>
+              </div>
+
               <div class="scene-row">
                 <strong>📷 画面描述：</strong>
                 <el-input
@@ -52,9 +65,11 @@
                   type="textarea"
                   :rows="2"
                 />
-                <p v-else>{{ scene.visualDescription }}</p>
+                <p v-else :class="{ 'locked-content': isSceneLocked(index) }">
+                  {{ scene.visualDescription }}
+                </p>
               </div>
-              
+
               <div class="scene-row">
                 <strong>🎤 文案/旁白：</strong>
                 <el-input
@@ -63,16 +78,20 @@
                   type="textarea"
                   :rows="2"
                 />
-                <p v-else>{{ scene.voiceover }}</p>
+                <p v-else :class="{ 'locked-content': isSceneLocked(index) }">
+                  {{ scene.voiceover }}
+                </p>
               </div>
-              
+
               <div class="scene-row">
                 <strong>📝 字幕提示：</strong>
                 <el-input
                   v-if="editing"
                   v-model="scene.subtitle"
                 />
-                <p v-else>{{ scene.subtitle }}</p>
+                <p v-else :class="{ 'locked-content': isSceneLocked(index) }">
+                  {{ scene.subtitle }}
+                </p>
               </div>
             </div>
           </div>
@@ -113,6 +132,24 @@
             取消
           </el-button>
         </div>
+
+        <!-- 重新生成按钮 -->
+        <div class="regenerate-actions">
+          <el-button
+            type="warning"
+            size="large"
+            @click="regenerateUnlockedScenes"
+            :icon="RefreshRight"
+            :loading="regenerating"
+            :disabled="regenerating"
+          >
+            {{ regenerating ? '重新生成中...' : '重新生成未锁定分镜' }}
+          </el-button>
+          <div class="lock-info">
+            <el-icon><InfoFilled /></el-icon>
+            <span>锁定你喜欢的分镜，然后点击重新生成来优化其他部分</span>
+          </div>
+        </div>
       </el-card>
     </div>
 
@@ -124,8 +161,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { getScriptDetail, updateScript, selectScript } from '@/api/script'
-import { DocumentCopy, Edit } from '@element-plus/icons-vue'
+import { getScriptDetail, updateScript, selectScript, updateSceneLock, regenerateScript } from '@/api/script'
+import { DocumentCopy, Edit, Lock, Unlock, RefreshRight, InfoFilled } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -133,13 +170,28 @@ const route = useRoute()
 const scriptDetail = ref(null)
 const editing = ref(false)
 const versionId = route.params.versionId
+const lockedScenes = ref(new Set()) // 锁定的分镜索引
+const regenerating = ref(false) // 重新生成中状态
+const sceneLocking = ref(new Set()) // 正在锁定/解锁的分镜索引
 
 /**
  * 加载脚本详情
  */
 const loadDetail = async () => {
   try {
-    scriptDetail.value = await getScriptDetail(versionId)
+    const detail = await getScriptDetail(versionId)
+    scriptDetail.value = detail
+
+    // 解析锁定的分镜
+    if (detail.lockedScenes) {
+      try {
+        const lockedArray = JSON.parse(detail.lockedScenes)
+        lockedScenes.value = new Set(lockedArray)
+      } catch (e) {
+        console.warn('解析锁定分镜数据失败:', e)
+        lockedScenes.value = new Set()
+      }
+    }
   } catch (error) {
     console.error('加载脚本详情失败:', error)
     ElMessage.error('加载失败，请刷新重试')
@@ -205,18 +257,80 @@ const saveScript = async () => {
     router.back()
   }
 
-  /**
-   * 保存脚本前更新选中状态
-   */
-  const updateSelectedStatus = async () => {
-    if (scriptDetail.value && scriptDetail.value.isSelected) {
-      try {
-        await selectScript(scriptDetail.value.id)
-      } catch (error) {
-        console.error('更新选中状态失败:', error)
-      }
+/**
+ * 检查分镜是否被锁定
+ */
+const isSceneLocked = (index) => {
+  return lockedScenes.value.has(index)
+}
+
+/**
+ * 切换分镜锁定状态
+ */
+const toggleSceneLock = async (index) => {
+  // 如果正在处理中，忽略点击
+  if (sceneLocking.value.has(index)) {
+    return
+  }
+
+  const currentlyLocked = isSceneLocked(index)
+  const willBeLocked = !currentlyLocked
+
+  try {
+    sceneLocking.value.add(index)
+    await updateSceneLock(versionId, index, willBeLocked)
+
+    if (willBeLocked) {
+      lockedScenes.value.add(index)
+      ElMessage.success(`分镜 ${index + 1} 已锁定`)
+    } else {
+      lockedScenes.value.delete(index)
+      ElMessage.success(`分镜 ${index + 1} 已解锁`)
+    }
+  } catch (error) {
+    console.error('更新分镜锁定状态失败:', error)
+    ElMessage.error('操作失败，请重试')
+  } finally {
+    sceneLocking.value.delete(index)
+  }
+}
+
+/**
+ * 重新生成未锁定分镜
+ */
+const regenerateUnlockedScenes = async () => {
+  if (lockedScenes.value.size === 0) {
+    ElMessage.warning('请先锁定至少一个分镜')
+    return
+  }
+
+  try {
+    regenerating.value = true
+    ElMessage.info('正在重新生成分镜，请稍候...')
+
+    const result = await regenerateScript(versionId)
+    scriptDetail.value.content = result
+    ElMessage.success('重新生成完成！锁定的分镜保持不变')
+  } catch (error) {
+    console.error('重新生成失败:', error)
+    ElMessage.error('重新生成失败，请重试')
+  } finally {
+    regenerating.value = false
+  }
+}
+
+/**
+ * 保存脚本前更新选中状态
+ */
+const updateSelectedStatus = async () => {
+  if (scriptDetail.value && scriptDetail.value.isSelected) {
+    try {
+      await selectScript(scriptDetail.value.id)
+    } catch (error) {
+      console.error('更新选中状态失败:', error)
     }
   }
+}
 
 onMounted(() => {
   loadDetail()
@@ -321,6 +435,39 @@ onMounted(() => {
   justify-content: center;
   gap: 12px;
   margin-top: 30px;
+}
+
+.regenerate-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 20px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border: 1px solid #d4e4ff;
+}
+
+.lock-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #606266;
+  font-size: 14px;
+}
+
+.scene-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.locked-content {
+  background: #fff7e6;
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid #e6a23c;
 }
 
 @media (max-width: 768px) {

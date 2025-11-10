@@ -56,7 +56,12 @@ public class ScriptVersion {
      * 分镜数量
      */
     private Integer sceneCount;
-    
+
+    /**
+     * 锁定的分镜索引（JSON数组，例如：[0,2,4]表示第1、3、5个分镜被锁定）
+     */
+    private String lockedScenes;
+
     /**
      * 创建时间
      */

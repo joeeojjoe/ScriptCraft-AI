@@ -1,62 +1,46 @@
 <template>
   <div class="script-list-container">
-    <el-page-header @back="goBack" content="选择脚本方案" />
+    <el-page-header @back="goBack" content="脚本详情" />
 
     <div class="script-content">
-      <el-tabs v-model="activeTab" type="card" class="script-tabs">
-        <el-tab-pane
-          v-for="version in versions"
-          :key="version.versionId"
-          :label="`方案 ${version.versionIndex}`"
-          :name="version.versionId"
-        >
-          <el-card class="script-card" :class="{ 'selected-card': version.isSelected }">
-            <template #header>
-              <div class="card-header">
-                <h2>{{ version.title }}</h2>
-                <div class="stats">
-                  <el-tag>{{ version.preview.sceneCount }} 个分镜</el-tag>
-                  <el-tag type="info">{{ version.preview.wordCount }} 字</el-tag>
-                  <el-tag v-if="version.isSelected" type="success">已选中</el-tag>
-                </div>
-              </div>
-            </template>
-
-            <div class="preview-content">
-              <h3>✨ 开场预览</h3>
-              <p>{{ version.preview.firstScene }}</p>
+      <el-card v-if="currentVersion" class="script-card selected-card">
+        <template #header>
+          <div class="card-header">
+            <h2>{{ currentVersion.title }}</h2>
+            <div class="stats">
+              <el-tag>{{ currentVersion.preview.sceneCount }} 个分镜</el-tag>
+              <el-tag type="info">{{ currentVersion.preview.wordCount }} 字</el-tag>
+              <el-tag type="success">已选中</el-tag>
             </div>
+          </div>
+        </template>
 
-            <div class="actions">
-              <el-button
-                type="primary"
-                size="large"
-                @click="viewDetail(version.versionId)"
-              >
-                <el-icon><View /></el-icon>
-                查看完整脚本
-              </el-button>
-              <el-button
-                v-if="!version.isSelected"
-                size="large"
-                @click="selectScript(version.versionId)"
-              >
-                <el-icon><Select /></el-icon>
-                选择此方案
-              </el-button>
-              <el-button
-                v-else
-                type="success"
-                size="large"
-                disabled
-              >
-                <el-icon><Check /></el-icon>
-                已选择此方案
-              </el-button>
-            </div>
-          </el-card>
-        </el-tab-pane>
-      </el-tabs>
+        <div class="preview-content">
+          <h3>✨ 开场预览</h3>
+          <p>{{ currentVersion.preview.firstScene }}</p>
+        </div>
+
+        <div class="actions">
+          <el-button
+            type="primary"
+            size="large"
+            @click="viewDetail(currentVersion.versionId)"
+          >
+            <el-icon><View /></el-icon>
+            查看完整脚本
+          </el-button>
+          <el-button
+            type="warning"
+            size="large"
+            @click="regenerateScript"
+          >
+            <el-icon><RefreshRight /></el-icon>
+            重新生成脚本
+          </el-button>
+        </div>
+      </el-card>
+
+      <el-empty v-else description="暂无脚本数据" />
 
       <div class="bottom-actions">
         <el-button @click="regenerate">
@@ -80,28 +64,26 @@ const router = useRouter()
 const route = useRoute()
 const scriptStore = useScriptStore()
 
-const activeTab = ref('')
-const versions = ref([])
+const currentVersion = ref(null)
 const sessionId = route.params.sessionId
 
-  /**
-   * 加载脚本列表
-   */
-  const loadVersions = async () => {
-    try {
-      const res = await getSessionVersions(sessionId)
-      versions.value = res.map(version => ({
-        ...version,
-        isSelected: version.isSelected === 1 // 后端返回的是数字，需要转换为布尔值
-      }))
-      if (res.length > 0) {
-        activeTab.value = res[0].versionId
+/**
+ * 加载脚本
+ */
+const loadVersions = async () => {
+  try {
+    const res = await getSessionVersions(sessionId)
+    if (res && res.length > 0) {
+      currentVersion.value = {
+        ...res[0],
+        isSelected: true // 只有一个版本，默认为选中状态
       }
-    } catch (error) {
-      console.error('加载脚本列表失败:', error)
-      ElMessage.error('加载失败，请刷新重试')
     }
+  } catch (error) {
+    console.error('加载脚本失败:', error)
+    ElMessage.error('加载失败，请刷新重试')
   }
+}
 
 /**
  * 查看脚本详情
@@ -110,22 +92,27 @@ const viewDetail = (versionId) => {
   router.push(`/script/detail/${versionId}`)
 }
 
-  /**
-   * 选择脚本
-   */
-  const selectScript = async (versionId) => {
-    try {
-      await selectScriptApi(versionId)
-      ElMessage.success('已标记为选中方案')
+/**
+ * 重新生成脚本
+ */
+const regenerateScript = async () => {
+  try {
+    const result = await ElMessageBox.confirm(
+      '确定要重新生成脚本吗？这将创建一个全新的脚本。',
+      '确认重新生成',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
 
-      // 更新本地状态
-      versions.value.forEach(version => {
-        version.isSelected = version.versionId === versionId
-      })
-    } catch (error) {
-      console.error('选择脚本失败:', error)
-    }
+    // 导航到生成页面重新生成
+    router.push('/generate')
+  } catch {
+    // 用户取消
   }
+}
 
 /**
  * 重新生成

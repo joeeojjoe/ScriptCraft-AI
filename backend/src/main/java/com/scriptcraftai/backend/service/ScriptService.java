@@ -79,5 +79,24 @@ public interface ScriptService {
      * @param sessionId 会话ID
      */
     void deleteSession(String sessionId);
+
+    /**
+     * 更新分镜锁定状态
+     *
+     * @param versionId 版本ID
+     * @param sceneIndex 分镜索引
+     * @param locked 是否锁定
+     * @param userId 用户ID
+     */
+    void updateSceneLock(String versionId, Integer sceneIndex, Boolean locked, String userId);
+
+    /**
+     * 基于现有脚本重新生成（保持锁定分镜不变）
+     *
+     * @param versionId 基础版本ID
+     * @param userId 用户ID
+     * @return 重新生成的脚本内容
+     */
+    ScriptContentDTO regenerateScript(String versionId, String userId);
 }
 

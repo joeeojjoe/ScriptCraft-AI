@@ -94,4 +94,32 @@ export const deleteScriptSession = (sessionId) => {
   })
 }
 
+/**
+ * 更新分镜锁定状态
+ *
+ * @param {string} versionId 版本ID
+ * @param {number} sceneIndex 分镜索引
+ * @param {boolean} locked 是否锁定
+ * @returns {Promise}
+ */
+export function updateSceneLock(versionId, sceneIndex, locked) {
+  return request({
+    url: `/scripts/versions/${versionId}/scenes/${sceneIndex}/lock`,
+    method: 'post',
+    params: { locked }
+  })
+}
+
+/**
+ * 重新生成脚本（保持锁定分镜不变）
+ *
+ * @param {string} versionId 版本ID
+ * @returns {Promise}
+ */
+export function regenerateScript(versionId) {
+  return request({
+    url: `/scripts/versions/${versionId}/regenerate`,
+    method: 'post'
+  })
+}
 

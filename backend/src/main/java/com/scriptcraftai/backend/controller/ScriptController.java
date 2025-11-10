@@ -121,7 +121,7 @@ public class ScriptController {
 
     /**
      * 标记选中脚本
-     * 
+     *
      * @param versionId 版本ID
      * @return 操作结果
      */
@@ -130,6 +130,36 @@ public class ScriptController {
         String userId = getCurrentUserId();
         scriptService.selectVersion(versionId, userId);
         return Result.success("标记成功");
+    }
+
+    /**
+     * 更新分镜锁定状态
+     *
+     * @param versionId 版本ID
+     * @param sceneIndex 分镜索引
+     * @param locked 是否锁定
+     * @return 操作结果
+     */
+    @PostMapping("/versions/{versionId}/scenes/{sceneIndex}/lock")
+    public Result<Void> updateSceneLock(@PathVariable String versionId,
+                                       @PathVariable Integer sceneIndex,
+                                       @RequestParam Boolean locked) {
+        String userId = getCurrentUserId();
+        scriptService.updateSceneLock(versionId, sceneIndex, locked, userId);
+        return Result.success(locked ? "分镜已锁定" : "分镜已解锁");
+    }
+
+    /**
+     * 重新生成脚本（保持锁定分镜不变）
+     *
+     * @param versionId 基础版本ID
+     * @return 重新生成的脚本内容
+     */
+    @PostMapping("/versions/{versionId}/regenerate")
+    public Result<ScriptContentDTO> regenerateScript(@PathVariable String versionId) {
+        String userId = getCurrentUserId();
+        ScriptContentDTO newContent = scriptService.regenerateScript(versionId, userId);
+        return Result.success(newContent, "重新生成成功");
     }
 
     /**

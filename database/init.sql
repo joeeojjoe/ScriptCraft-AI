@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS script_versions (
     is_selected TINYINT DEFAULT 0 COMMENT '是否被选中:1-是,0-否',
     word_count INT COMMENT '字数统计',
     scene_count INT COMMENT '分镜数量',
+    locked_scenes VARCHAR(500) COMMENT '锁定的分镜索引(JSON数组，如:[0,2,4])',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_session_id (session_id),
