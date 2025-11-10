@@ -22,7 +22,10 @@ public class RedisConfig {
 
     /**
      * 配置RedisTemplate
-     *
+     * 1. Spring Data Redis Starter 根据配置创建 RedisConnectionFactory
+     * 2. 注入RedisConnectionFactory来连接Redis服务器
+     * 3. 使用StringRedisSerializer来序列化和反序列化redis的key值
+     * 4. 使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
      * @param connectionFactory Redis连接工厂
      * @return RedisTemplate实例
      */
@@ -34,7 +37,10 @@ public class RedisConfig {
 
         // 配置 ObjectMapper
         ObjectMapper om = new ObjectMapper();
+        // 配置 ObjectMapper 可以访问所有属性（包括 private 字段），用于 JSON 序列化/反序列化
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 启用默认类型推断，允许在序列化时保存对象的具体类型信息
+        // 使用 LaissezFaireSubTypeValidator.instance 作为类型验证器，对非 final 类型进行类型信息存储
         om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 
         // 使用构造函数方式传入 ObjectMapper（避免弃用警告）
@@ -52,6 +58,7 @@ public class RedisConfig {
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
 
+        // 初始化 RedisTemplate，确保 RedisTemplate 的属性已经设置
         template.afterPropertiesSet();
         return template;
     }
