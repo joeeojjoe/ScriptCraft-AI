@@ -59,7 +59,6 @@ cd backend
 
 # 配置环境变量（必须）
 export DB_PASSWORD=root  # 你的MySQL密码
-export JWT_SECRET=ScriptCraftAI2025SecretKeyForJWTTokenGenerationAndValidation
 export TONGYI_API_KEY=your_tongyi_api_key  # 你的通义千问API Key
 
 # 启动后端
@@ -126,9 +125,6 @@ ScriptCraft-AI/
 │   └── package.json
 ├── database/            # 数据库脚本
 │   └── init.sql
-├── docs/                # 项目文档
-│   ├── API.md
-│   └── DEPLOYMENT.md
 └── README.md
 ```
 
@@ -173,18 +169,11 @@ npm install
 4. 检查网络连接
 ```
 
-## 📚 详细文档
-
-- [API接口文档](./docs/API.md)
-- [部署文档](./docs/DEPLOYMENT.md)
-- [后端README](./backend/README.md)
-- [前端README](./frontend/README.md)
-
 ## 🎨 技术栈
 
 ### 后端
 - Spring Boot 3.2.0
-- Spring Security + JWT
+- Spring Security
 - MyBatis 3.0.3
 - MySQL 8.0
 - Redis 7.0
@@ -196,32 +185,4 @@ npm install
 - Vite 5.0
 - Pinia 2.1
 - Axios 1.6
-
-## 🤝 贡献指南
-
-欢迎提交Issue和Pull Request！
-
-1. Fork本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'feat: 添加某个功能'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 提交Pull Request
-
-## 📄 开源协议
-
-本项目采用 [MIT License](LICENSE)
-
-## 🙏 致谢
-
-- 感谢阿里云提供通义千问API
-- 感谢所有开源项目贡献者
-
-## 📮 联系方式
-
-- 项目地址：https://github.com/your-repo/ScriptCraft-AI
-- 问题反馈：https://github.com/your-repo/ScriptCraft-AI/issues
-
----
-
-**祝您使用愉快！如有问题请随时反馈。** 🎬✨
 

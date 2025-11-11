@@ -22,7 +22,7 @@
 ### 技术栈
 ```
 前端：Vue 3 + JavaScript + Element Plus + Tailwind CSS + Pinia + Vue Router
-后端：Spring Boot 3.x + Spring Security + JWT + MyBatis + MySQL 8.0 + Redis
+后端：Spring Boot 3.x + Spring Security + MyBatis + MySQL 8.0 + Redis
 AI服务：阿里云通义千问API
 ```
 
@@ -255,9 +255,6 @@ ScriptCraft-AI/
 │   ├── init.sql               # 初始化脚本
 │   └── sample_data.sql        # 示例数据
 │
-├── docs/                        # 项目文档
-│   ├── API.md                 # API文档
-│   └── DEPLOYMENT.md          # 部署文档
 │
 ├── .gitignore
 └── README.md
@@ -291,7 +288,6 @@ cd backend
 
 # 配置环境变量
 export DB_PASSWORD=root  # MySQL密码
-export JWT_SECRET=ScriptCraftAI2025SecretKeyForJWTTokenGenerationAndValidation
 export TONGYI_API_KEY=your_tongyi_api_key  # 通义千问API Key
 
 # 启动应用
@@ -341,7 +337,7 @@ npm run dev
 
 #### 技术栈
 - Spring Boot 3.2.0
-- Spring Security + JWT
+- Spring Security
 - MyBatis 3.0.3
 - MySQL 8.0
 - Redis 7.0
@@ -410,9 +406,6 @@ spring:
       host: localhost
       port: 6379
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: 604800000  # 7天
 
 tongyi:
   api-key: ${TONGYI_API_KEY}
@@ -547,8 +540,6 @@ npm run dev
 - `PUT /api/scripts/versions/{versionId}` - 更新脚本内容
 - `POST /api/scripts/versions/{versionId}/select` - 标记选中脚本
 
-详细API文档请查看 [docs/API.md](docs/API.md)
-
 ## 🎯 开发规范
 
 ### 后端规范
@@ -577,16 +568,6 @@ npm run dev
 - `refactor: 代码重构`
 - `test: 测试相关`
 - `chore: 构建/配置相关`
-
-## 🤝 贡献指南
-欢迎提交Issue和Pull Request！
-
-## 📄 开源协议
-MIT License
-
-## 👥 联系方式
-- 项目维护者：[Your Name]
-- 邮箱：[Your Email]
 
 ---
 **注意**：本项目使用了阿里云通义千问API，需要申请API Key才能使用。请访问[阿里云官网](https://www.aliyun.com/product/tongyi)申请。
